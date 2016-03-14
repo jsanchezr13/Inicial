@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<!-- Declares the root element that allows behaviour to be modified through Angular custom HTML tags. -->
+<html ng-app="clientes">
+<head>
+    <title>Banco - Angular</title>
+
+    <!-- build:css css/third-party.css -->
+    <!-- bower:css -->
+    <link rel="stylesheet" href="lib/dependencies/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="lib/dependencies/css/ng-grid.min.css" />
+    <!-- endbower -->
+    <!-- endbuild -->
+
+    <!-- build:css css/application.css -->
+    <link rel="stylesheet" type="text/css" href="css/style.css"/>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.0/css/smoothness/jquery-ui-1.10.0.custom.min.css" />   
+    <!-- endbuild -->
+
+    <!-- build:js lib/third-party.js -->
+    <!-- bower:js -->
+    <script src="lib/dependencies/jquery.min.js"></script>
+    <script src="lib/dependencies/angular.min.js"></script>
+    <script src="lib/dependencies/angular-resource.min.js"></script>
+    <script src="lib/dependencies/ng-grid-2.0.11.min.js"></script>
+    <script src="lib/dependencies/ui-bootstrap-tpls.min.js"></script>  
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.0/jquery-ui.js"></script>
+    <!-- endbower -->
+    <!-- endbuild -->
+
+    <!-- build:js script/all.js -->
+    <script src="script/cliente.js"></script>
+    <!-- endbuild -->
+</head>
+
+<body>
+
+<h1>Banco Java EE - Angular Application</h1>
+
+<br/>
+
+<!-- Specify a Angular controller script that binds Javascript variables to the feedback messages.-->
+<div class="message" ng-controller="alertMessagesController">
+    <alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">{{alert.msg}}</alert>
+</div>
+
+<br>
+
+<!-- Specify a Angular controller script that binds Javascript variables to the grid.-->
+<div class="grid" ng-controller="clientesListController">
+    <div>
+        <h3>Lista de clientes</h3>
+    </div>
+
+    <!-- Binds the grid component to be displayed. -->
+    <div class="gridStyle" ng-grid="gridOptions"></div>
+
+    <!--  Bind the pagination component to be displayed. -->
+    <pagination direction-links="true" boundary-links="true"
+                total-items="clientes.totalResults" items-per-page="clientes.pageSize"
+                ng-model="clientes.currentPage" ng-change="refreshGrid()">
+    </pagination>
+</div>
+
+
+
+
+
+
+
+
+
+
+<div class="form" ng-controller="clientesFormController">
+    <!-- Verify person, if there is no id present, that we are Adding a Person -->
+    <div ng-if="cliente.id == null">
+        <h3>Add Cliente</h3>
+    </div>
+    <!-- Otherwise it's an Edit -->
+    <div ng-if="cliente.id != null">
+        <h3>Edit Cliente</h3>
+    </div>
+
+    <div>
+        <!-- Specify the function to be called on submit and disable HTML5 validation, since we're using Angular validation-->
+        <form name="clienteForm" ng-submit="updateCliente()" novalidate>
+            
+            <div class="form-group" ng-class="{'has-error' : clienteForm.tipoIdentificacion.$invalid && clienteForm.tipoIdentificacion.$dirty}">
+                <label for="tipoIdentificacion">Tipo de identificacion:</label>
+                <!-- Display a check when the field is valid and was modified -->
+                <span ng-class="{'glyphicon glyphicon-ok' : clienteForm.tipoIdentificacion.$valid && clienteForm.tipoIdentificacion.$dirty}"></span>
+
+                <input id="tipoIdentificacion" name="tipoIdentificacion" type="text" class="form-control" maxlength="30"
+                       ng-model="cliente.tipoIdentificacion"
+                       required ng-minlength="1" ng-maxlength="30"/>
+
+                <!-- Validation messages to be displayed on required, minlength and maxlength -->
+                <p class="help-block" ng-show="clienteForm.tipoIdentificacion.$error.required">Anadir tipoIdentificacion.</p>
+                <p class="help-block" ng-show="clienteForm.tipoIdentificacion.$error.minlength">tipoIdentificacion debe tener por lo menos 5 caracteres.</p>
+                <p class="help-block" ng-show="clienteForm.tipoIdentificacion.$error.maxlength">tipoIdentificacion no puede tener mas de 50 caracteres.</p>
+            </div>
+            
+            <!-- Display an error if the input is invalid and is dirty (only when someone changes the value) -->
+            <div class="form-group" ng-class="{'has-error' : clienteForm.identificacion.$invalid && clienteForm.identificacion.$dirty}">
+                <label for="identificacion">Identificacion:</label>
+                <!-- Display a check when the field is valid and was modified -->
+                <span ng-class="{'glyphicon glyphicon-ok' : clienteForm.identificacion.$valid && clienteForm.identificacion.$dirty}"></span>
+
+                <input id="identificacion" name="identificacion" type="number" class="form-control" maxlength="30"
+                       ng-model="cliente.identificacion"
+                       required ng-minlength="5" ng-maxlength="30"/>
+
+                <!-- Validation messages to be displayed on required, minlength and maxlength -->
+                <p class="help-block" ng-show="clienteForm.identificacion.$error.required">Anadir identificacion.</p>
+                <p class="help-block" ng-show="clienteForm.identificacion.$error.minlength">Identificacion debe tener por lo menos 5 numeros.</p>
+                <p class="help-block" ng-show="clienteForm.identificacion.$error.maxlength">Identificacion no puede tener mas de 50 caracteres.</p>
+            </div>
+
+            <!-- Display an error if the input is invalid and is dirty (only when someone changes the value) -->
+            <div class="form-group" ng-class="{'has-error' : clienteForm.nombre.$invalid && clienteForm.nombre.$dirty}">
+                <label for="nombre">Nombre:</label>
+                <!-- Display a check when the field is valid and was modified -->
+                <span ng-class="{'glyphicon glyphicon-ok' : clienteForm.nombre.$valid && clienteForm.nombre.$dirty}"></span>
+
+                <input id="nombre" name="nombre" type="text" class="form-control" maxlength="50"
+                       ng-model="cliente.nombre"
+                       required ng-minlength="2" ng-maxlength="50"/>
+
+                <!-- Validation messages to be displayed on required, minlength and maxlength -->
+                <p class="help-block" ng-show="clienteForm.nombre.$error.required">Anadir nombre.</p>
+                <p class="help-block" ng-show="clienteForm.nombre.$error.minlength">El nombre debe tener por lo menos 2 caracteres.</p>
+                <p class="help-block" ng-show="clienteForm.nombre.$error.maxlength">Nombre no puede tener mas de 50 caracteres.</p>
+            </div>
+            
+            <div class="form-group" ng-class="{'has-error' : clienteForm.genero.$invalid && clienteForm.genero.$dirty}">
+                <label for="genero">Genero:</label>
+                <!-- Display a check when the field is valid and was modified -->
+                <span ng-class="{'glyphicon glyphicon-ok' : clienteForm.genero.$valid && clienteForm.genero.$dirty}"></span>
+
+                <input id="genero" name="genero" type="text" class="form-control" maxlength="50"
+                       ng-model="cliente.genero"
+                       required ng-minlength="1" ng-maxlength="20"/>
+
+                <!-- Validation messages to be displayed on required, minlength and maxlength -->
+                <p class="help-block" ng-show="clienteForm.genero.$error.required">Anadir genero.</p>
+                <p class="help-block" ng-show="clienteForm.genero.$error.minlength">El genero debe tener por lo menos 1 caracter.</p>
+                <p class="help-block" ng-show="clienteForm.genero.$error.maxlength">Nombre no puede tener mas de 20 caracteres.</p>
+            </div>
+            
+            <div class="form-group" ng-class="{'has-error' : clienteForm.fechaNacimiento.$invalid && clienteForm.fechaNacimiento.$dirty}">
+                <label for="fechaNacimiento">Fecha nacimiento:</label>
+                <!-- Display a check when the field is valid and was modified -->
+                <span ng-class="{'glyphicon glyphicon-ok' : clienteForm.fechaNacimiento.$valid && clienteForm.fechaNacimiento.$dirty}"></span>
+
+                <!--<input id="fechaNacimiento" name="fechaNacimiento" type="text" class="form-control" maxlength="50"
+                       ng-model="cliente.fechaNacimiento"
+                       required ng-minlength="1" ng-maxlength="20"/>-->
+                
+                <input id="fechaNacimiento" name="fechaNacimiento" type="text" ng-model="cliente.fechaNacimiento" ca-datepicker="yy-mm-dd"/>
+
+                <!-- Validation messages to be displayed on required, minlength and maxlength -->
+                <p class="help-block" ng-show="clienteForm.fechaNacimiento.$error.required">Anadir fecha nacimiento.</p>
+            </div>
+            
+            <!--<h:outputLabel for="fechaNacimiento" value="Fecha nacimiento: *" />
+            <p:calendar id="fechaNacimiento" value="#{gestorClientes.cliente.fechaNacimiento}"/>
+            <p:message for="fechaNacimiento" display="icon"/>-->
+
+            <!-- Display an error if the input is invalid and is dirty (only when someone changes the value) 
+            <div class="form-group" ng-class="{'has-error' : personForm.imageUrl.$invalid && personForm.imageUrl.$dirty}">
+                <label for="imageUrl">Image URL:</label>
+                <span ng-class="{'glyphicon glyphicon-ok' : personForm.imageUrl.$valid && personForm.imageUrl.$dirty}"></span>
+
+                <input id="imageUrl" name="imageUrl" type="url" class="form-control" maxlength="500"
+                       ng-model="person.imageUrl"
+                       required/>
+
+                <p class="help-block" ng-show="personForm.imageUrl.$error.required">Add Image URL.</p>
+                <p class="help-block" ng-show="personForm.imageUrl.$invalid && personForm.imageUrl.$dirty">Invalid Image URL.</p>
+            </div>
+
+            <div class="avatar" ng-if="person.imageUrl">
+                <img ng-src="{{person.imageUrl}}" width="400" height="250"/>
+            </div>-->
+
+            <!-- Form buttons. The 'Save' button is only enabled when the form is valid. -->
+            <div class="buttons">
+                <button type="button" class="btn btn-primary" ng-click="clearForm()">Clear</button>
+                <button type="submit" class="btn btn-primary" ng-disabled="clienteForm.$invalid">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>

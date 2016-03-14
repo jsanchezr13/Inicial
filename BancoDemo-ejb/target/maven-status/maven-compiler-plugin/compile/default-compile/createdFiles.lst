@@ -1,0 +1,10 @@
+com\banco\exceptions\BancoException.class
+com\banco\entidades\Cliente.class
+com\banco\ejb\AbstractFacade.class
+com\banco\entidades\Cuenta.class
+com\banco\entidades\TipoIdentificacion.class
+com\banco\ejb\CuentaFacade.class
+com\banco\entidades\Movimiento.class
+com\banco\entidades\TipoOperacion.class
+com\banco\ejb\ClienteFacade.class
+com\banco\entidades\Genero.class
